@@ -7,6 +7,7 @@ const cors = require('cors');
 
 // const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+const flashcardsRouter = require('./routes/flashcards');
 
 const {InvalidParam} = require('node-schema-validator');
 
@@ -27,6 +28,7 @@ require('./config/mongoose');
 app.use(cors());
 // app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/flashcards', flashcardsRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
