@@ -1,10 +1,10 @@
 const Schema = require('../schemas/Flashcards');
-const crypto = require('../helpers/crypto/crypto');
 const {Scope} = require('node-schema-validator');
-
+const BOX = require('../helpers/box/boxConstants');
 
 module.exports = {
-    create
+    create,
+    read
 };
 
 async function create(req, res, next) {
@@ -32,17 +32,50 @@ async function create(req, res, next) {
         const scope = new Scope();
         scope.isValid(params, schema);
 
-        const tenMinutes = 1000 * 60 * 10;
-        const nextRevision = new Date().getTime() + tenMinutes;
+        const nextRevision = new Date().getTime() + BOX["1"].time;
         params = {...params, nextRevision: nextRevision};
 
-        Schema.create(params).then(response => {
-            res.status(200).json({
-                message: 'OK',
-                id: response.id
-            })
-        }, err => {
-            next(err)
+        const flashcard = await Schema.create(params);
+
+        res.status(200).json({
+            message: 'OK',
+            id: flashcard.id
+        })
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function read(req, res, next) {
+    try {
+
+        let params = {
+            quantity: req.query.quantity || 10,
+            date: new Date().toISOString()
+        };
+
+        const schema = {
+            quantity: {
+                type: Number,
+                required: true
+            }
+        };
+
+        const scope = new Scope();
+
+        scope.isValid(params, schema);
+
+        const flashcards = await Schema.find({
+            nextRevision: {
+                $lte: params.date
+            }
+        }).limit(params.quantity);
+
+        res.status(200).json({
+            currentTime: params.date,
+            length: flashcards.length,
+            content: flashcards
         });
 
     } catch (error) {
