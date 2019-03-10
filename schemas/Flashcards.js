@@ -18,6 +18,10 @@ const Flashcards = new Schema({
         type: Date,
         required: true
     },
+    idUser: {
+        type: String,
+        required: true
+    },
     registrationData: {
         type: Date,
         default: Date.now

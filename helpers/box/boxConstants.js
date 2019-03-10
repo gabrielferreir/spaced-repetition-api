@@ -18,31 +18,31 @@ module.exports = {
     4: {
         time: ONE_HOUR * 2
     },
-    6: {
+    5: {
         time: ONE_HOUR * 8
     },
-    7: {
+    6: {
         time: ONE_DAY
     },
-    8: {
+    7: {
         time: ONE_DAY * 3
     },
-    9: {
+    8: {
         time: ONE_DAY * 7
     },
-    10: {
+    9: {
         time: ONE_DAY * 15
     },
-    11: {
+    10: {
         time: ONE_MONTH
     },
-    12: {
+    11: {
         time: ONE_MONTH * 3
     },
-    13: {
+    12: {
         time: ONE_MONTH * 6
     },
-    14: {
+    13: {
         time: ONE_YEAR
     }
 };

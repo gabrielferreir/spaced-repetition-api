@@ -214,7 +214,6 @@ async function checkEmail(req, res, next) {
 }
 
 async function decode(req, res, next) {
-    console.log('decode');
 
     try {
 
@@ -283,12 +282,13 @@ async function authorize(req, res, next) {
             message: 'Acesso restrito'
         });
     } else {
-        jwt.verify(token, KEY, (error, decoded) => {
+        jwt.verify(token, KEY, async (error, decoded) => {
             if (error) {
                 return res.status(401).json({
                     message: 'Token inválido'
                 });
             } else {
+                req.user = decoded;
                 next();
             }
         });

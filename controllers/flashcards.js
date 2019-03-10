@@ -1,10 +1,13 @@
 const Schema = require('../schemas/Flashcards');
 const {Scope} = require('node-schema-validator');
 const BOX = require('../helpers/box/boxConstants');
+const {refeshBox, nextDateRevison} = require('../services/flashcards');
 
 module.exports = {
     create,
-    read
+    read,
+    refesh,
+    revision
 };
 
 async function create(req, res, next) {
@@ -12,6 +15,7 @@ async function create(req, res, next) {
         let params = {
             question: req.body.question,
             answer: req.body.answer,
+            idUser: req.user.id
         };
 
         const schema = {
@@ -52,6 +56,7 @@ async function read(req, res, next) {
 
         let params = {
             quantity: req.query.quantity || 10,
+            idUser: req.user.id,
             date: new Date().toISOString()
         };
 
@@ -67,6 +72,7 @@ async function read(req, res, next) {
         scope.isValid(params, schema);
 
         const flashcards = await Schema.find({
+            idUser: params.idUser,
             nextRevision: {
                 $lte: params.date
             }
@@ -77,6 +83,70 @@ async function read(req, res, next) {
             length: flashcards.length,
             content: flashcards
         });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function refesh(req, res, next) {
+    try {
+
+        let params = {
+            idUser: req.user.id,
+            date: new Date().toISOString()
+        };
+
+        const flashcards = await Schema.find({
+            idUser: params.idUser,
+            nextRevision: {
+                $lte: params.date
+            }
+        });
+
+        let updateFlashcards = flashcards.map(_flashcard => refeshBox(_flashcard));
+
+        for (let i = 0; i < updateFlashcards.length; i++) {
+            await Schema.update({_id: updateFlashcards[i]._id}, updateFlashcards[i])
+        }
+
+        res.status(200).json({
+            currentTime: params.date,
+            length: flashcards.length,
+            contentWithout: flashcards,
+            content: updateFlashcards
+        });
+
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function revision(req, res, next) {
+    try {
+
+        let params = {
+            idFlashcard: req.params.id,
+            idUser: req.user.id,
+            currentDate: new Date()
+        };
+
+        const flashcard = await Schema.findOne({
+            _id: params.idFlashcard,
+            idUser: params.idUser
+        });
+        flashcard.nextRevision = nextDateRevison(params.currentDate, flashcard.box);
+
+        await Schema.update({
+            _id: params.idFlashcard,
+            idUser: params.idUser
+        }, flashcard);
+
+        res.status(200).json({
+            'message': 'OK'
+        });
+
 
     } catch (error) {
         next(error);
