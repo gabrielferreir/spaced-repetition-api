@@ -21,6 +21,8 @@
     "pug": "2.0.0-beta11"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.1",
     "mocha": "^6.0.2",
     "nodemon": "^1.18.10"
   }

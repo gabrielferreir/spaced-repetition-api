@@ -1,5 +1,11 @@
 const assert = require('assert');
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const should = chai.should();
+const enviroment = require('./enviroment');
 const {refeshBox, nextDateRevison} = require('../services/flashcards');
+
+chai.use(chaiHttp);
 
 const FLASHCARDS = {
     'box': 4,
@@ -25,5 +31,18 @@ describe('Flashcard Test', () => {
         const nextDate = nextDateRevison(currentDate, currentBox);
         assert.deepEqual(dateRevison, nextDate);
     })
+
+});
+
+describe('Flashcard API Test', () => {
+
+    it('should GET flashcards', () => {
+        chai.request(enviroment.url)
+            .get('/flashcards')
+            .set('authentication', enviroment.authentication)
+            .end((err, res) => {
+                res.should.have.status(200);
+            })
+    });
 
 });
