@@ -8,6 +8,7 @@ const cors = require('cors');
 // const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const flashcardsRouter = require('./routes/flashcards');
+const decksRouter = require('./routes/decks');
 
 const {InvalidParam} = require('node-schema-validator');
 
@@ -29,6 +30,7 @@ app.use(cors());
 // app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/flashcards', flashcardsRouter);
+app.use('/decks', decksRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

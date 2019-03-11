@@ -36,12 +36,37 @@ describe('Flashcard Test', () => {
 
 describe('Flashcard API Test', () => {
 
-    it('should GET flashcards', () => {
+    it('should GET flashcards', (done) => {
         chai.request(enviroment.url)
             .get('/flashcards')
             .set('authentication', enviroment.authentication)
             .end((err, res) => {
                 res.should.have.status(200);
+                done();
+            })
+    });
+
+    it('should CREATE flashcards', (done) => {
+        chai.request(enviroment.url)
+            .post('/flashcards')
+            .set('authentication', enviroment.authentication)
+            .send({
+                question: `Question 01 ${new Date().toISOString()}`,
+                answer: "Answer 01"
+            })
+            .end((err, res) => {
+                res.should.have.status(200);
+                done();
+            })
+    });
+
+    it('should REFESH flashcards', (done) => {
+        chai.request(enviroment.url)
+            .get('/flashcards/refesh')
+            .set('authentication', enviroment.authentication)
+            .end((err, res) => {
+                res.should.have.status(200);
+                done();
             })
     });
 
