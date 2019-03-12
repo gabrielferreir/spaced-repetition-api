@@ -65,6 +65,7 @@ describe('Flashcard API Test', () => {
             .get('/flashcards/refesh')
             .set('authentication', enviroment.authentication)
             .end((err, res) => {
+                console.log(res.body);
                 res.should.have.status(200);
                 done();
             })

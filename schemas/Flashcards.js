@@ -10,6 +10,11 @@ const Flashcards = new Schema({
         type: String,
         required: true
     },
+    idDeck: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'Deck',
+        required: true
+    },
     box: {
         type: Number,
         default: 1

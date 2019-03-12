@@ -1,11 +1,14 @@
 const Schema = require('../schemas/Flashcards');
+const deckSchema = require('../schemas/Decks');
 const {Scope} = require('node-schema-validator');
+const {Types} = require('mongoose');
 const BOX = require('../helpers/box/boxConstants');
 const {refeshBox, nextDateRevison} = require('../services/flashcards');
 
 module.exports = {
     create,
-    read,
+    getFlashcardsRevision,
+    getFlashcards,
     refesh,
     revision
 };
@@ -15,7 +18,8 @@ async function create(req, res, next) {
         let params = {
             question: req.body.question,
             answer: req.body.answer,
-            idUser: req.user.id
+            idUser: req.user.id,
+            idDeck: req.body.idDeck
         };
 
         const schema = {
@@ -30,11 +34,31 @@ async function create(req, res, next) {
                 required: true,
                 minLength: 1,
                 maxLength: 500
+            },
+            idDeck: {
+                type: String,
+                required: true,
+                Function: value => {
+                    if (!Types.ObjectId.isValid(params.idDeck)) {
+                        return {
+                            message: `Is not ObjectId type`,
+                            type: 'ObjectId'
+                        };
+                    }
+                }
             }
         };
 
         const scope = new Scope();
         scope.isValid(params, schema);
+
+        const deck = await deckSchema.findOne({_id: params.idDeck});
+
+        if (!deck) {
+            return res.status(400).json({
+                message: 'Esse Deck não foi encontrado'
+            })
+        }
 
         const nextRevision = new Date().getTime() + BOX["1"].time;
         params = {...params, nextRevision: nextRevision};
@@ -51,11 +75,11 @@ async function create(req, res, next) {
     }
 }
 
-async function read(req, res, next) {
+async function getFlashcardsRevision(req, res, next) {
     try {
 
         let params = {
-            quantity: req.query.quantity || 10,
+            quantity: req.query.quantity || 100,
             idUser: req.user.id,
             date: new Date().toISOString()
         };
@@ -80,7 +104,29 @@ async function read(req, res, next) {
 
         res.status(200).json({
             currentTime: params.date,
-            length: flashcards.length,
+            content: flashcards
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function getFlashcards(req, res, next) {
+    try {
+
+        let params = {
+            quantity: req.query.quantity || 100,
+            idUser: req.user.id,
+            idDeck: req.params.idDeck
+        };
+
+        const flashcards = await Schema.find({
+            idUser: params.idUser,
+            idDeck: params.idDeck
+        }).limit(params.quantity);
+
+        res.status(200).json({
             content: flashcards
         });
 
@@ -111,9 +157,6 @@ async function refesh(req, res, next) {
         }
 
         res.status(200).json({
-            currentTime: params.date,
-            length: flashcards.length,
-            contentWithout: flashcards,
             content: updateFlashcards
         });
 
@@ -136,7 +179,15 @@ async function revision(req, res, next) {
             _id: params.idFlashcard,
             idUser: params.idUser
         });
+
+        if (!flashcard) {
+            return res.status(404).json({
+                message: 'Flashcard não encontrado'
+            });
+        }
+
         flashcard.nextRevision = nextDateRevison(params.currentDate, flashcard.box);
+        flashcard.box = flashcard.box + 1;
 
         await Schema.update({
             _id: params.idFlashcard,
@@ -144,7 +195,8 @@ async function revision(req, res, next) {
         }, flashcard);
 
         res.status(200).json({
-            'message': 'OK'
+            'message': 'OK',
+            'nextRevision': flashcard.nextRevision
         });
 
 
