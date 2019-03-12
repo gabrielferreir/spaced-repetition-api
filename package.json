@@ -6,7 +6,7 @@
     "start": "node ./bin/www",
     "debug": "node %NODE_DEBUG_OPTION% ./bin/www",
     "nodemon": "nodemon ./bin/www",
-    "test": "mocha ./test"
+    "test": "mocha ./test --slow 200"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
