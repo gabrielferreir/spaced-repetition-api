@@ -4,6 +4,7 @@ const {Scope} = require('node-schema-validator');
 const {Types} = require('mongoose');
 const BOX = require('../helpers/box/boxConstants');
 const {refeshBox, nextDateRevison} = require('../services/flashcards');
+const configMongoose = require('../config/mongoose');
 
 module.exports = {
     create,
@@ -63,7 +64,8 @@ async function create(req, res, next) {
         const nextRevision = new Date().getTime() + BOX["1"].time;
         params = {...params, nextRevision: nextRevision};
 
-        const flashcard = await Schema.create(params);
+        // console.log('global.session', global.session);
+        const flashcard = await Schema.create([params], {session: global.session});
 
         res.status(200).json({
             message: 'OK',
@@ -71,6 +73,7 @@ async function create(req, res, next) {
         })
 
     } catch (error) {
+        console.log(error);
         next(error);
     }
 }

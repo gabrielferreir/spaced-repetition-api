@@ -9,6 +9,9 @@ const usersRouter = require('./routes/users');
 const flashcardsRouter = require('./routes/flashcards');
 const decksRouter = require('./routes/decks');
 
+
+const mongoose = require('./config/mongoose');
+
 const {InvalidParam} = require('node-schema-validator');
 
 const app = express();
@@ -23,13 +26,27 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-require('./config/mongoose');
-
 app.use(cors());
+
+app.use((req, res, next) => {
+    console.log(req.headers.test);
+    const isTest = !!req.headers.test;
+    if (isTest) {
+        mongoose.startTransaction();
+    }
+    next();
+});
 // app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/flashcards', flashcardsRouter);
 app.use('/decks', decksRouter);
+
+
+app.use((req, res, next) => {
+    if (isTest) {
+        mongoose.rollbackTransaction();
+    }
+});
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

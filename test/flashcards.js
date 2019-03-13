@@ -4,6 +4,7 @@ const chaiHttp = require('chai-http');
 const should = chai.should();
 const enviroment = require('./enviroment');
 const {refeshBox, nextDateRevison} = require('../services/flashcards');
+const mongoose = require('../config/mongoose');
 
 chai.use(chaiHttp);
 
@@ -36,6 +37,16 @@ describe('Flashcard Test', () => {
 
 describe('Flashcard API Test', () => {
 
+    // beforeEach(done => {
+    //     console.log('beforeEach');
+    //     mongoose.startTransaction().then(() => done());
+    // });
+    //
+    // afterEach(done => {
+    //     console.log('afterEach');
+    //     mongoose.rollbackTransaction().then(() => done());
+    // });
+
     it('should GET flashcards', (done) => {
         chai.request(enviroment.url)
             .get('/flashcards')
@@ -50,9 +61,11 @@ describe('Flashcard API Test', () => {
         chai.request(enviroment.url)
             .post('/flashcards')
             .set('authentication', enviroment.authentication)
+            .set('test', true)
             .send({
                 question: `Question 01 ${new Date().toISOString()}`,
-                answer: "Answer 01"
+                answer: "Answer 01",
+                idDeck: '5c87e1159606084658f58511'
             })
             .end((err, res) => {
                 res.should.have.status(200);
@@ -65,7 +78,6 @@ describe('Flashcard API Test', () => {
             .get('/flashcards/refesh')
             .set('authentication', enviroment.authentication)
             .end((err, res) => {
-                console.log(res.body);
                 res.should.have.status(200);
                 done();
             })
