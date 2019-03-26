@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
-
-mongoose.connect('mongodb://localhost:27017/spaced-repetition-flutter', {useNewUrlParser: true});
+const mongoenv = {
+    host: process.env.MONGO_PORT || 'localhost',
+    port: process.env.MONGO_PORT || '27017',
+    db: process.env.MONGO_DB || 'spaced-repetition-flutter',
+    user: process.env.MONGO_USER || null,
+    passs: process.env.MONGO_PASS || null,
+};
+mongoose.connect(`mongodb://${mongoenv.user}:${mongoenv.passs}@${mongoenv.host}:${mongoenv.port}/${mongoenv.db}`, {useNewUrlParser: true});
 
 const mongoConnection = mongoose.connection;
 
