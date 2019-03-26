@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const mongoenv = {
-    host: process.env.MONGO_PORT || 'localhost',
+    host: process.env.MONGO_HOST || 'localhost',
     port: process.env.MONGO_PORT || '27017',
     db: process.env.MONGO_DB || 'spaced-repetition-flutter',
     user: process.env.MONGO_USER || null,
