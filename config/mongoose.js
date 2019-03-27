@@ -1,12 +1,11 @@
-const devEnviroments = require('../dev-enviroments.js');
 const mongoose = require('mongoose');
 
 const mongoenv = {
-    host: process.env.MONGO_HOST || devEnviroments.host,
-    port: process.env.MONGO_PORT || devEnviroments.port,
-    db: process.env.MONGO_DB || devEnviroments.db,
-    user: process.env.MONGO_USER || devEnviroments.user,
-    pass: process.env.MONGO_PASS || devEnviroments.pass
+    host: process.env.MONGO_HOST,
+    port: process.env.MONGO_PORT,
+    db: process.env.MONGO_DB,
+    user: process.env.MONGO_USER,
+    pass: process.env.MONGO_PASS
 };
 
 console.log(`mongodb://${mongoenv.user}:${mongoenv.pass}@${mongoenv.host}:${mongoenv.port}/${mongoenv.db}`);
