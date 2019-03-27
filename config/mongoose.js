@@ -1,11 +1,15 @@
+const devEnviroments = require('../dev-enviroments.js');
 const mongoose = require('mongoose');
+
 const mongoenv = {
-    host: process.env.MONGO_HOST || 'localhost',
-    port: process.env.MONGO_PORT || '27017',
-    db: process.env.MONGO_DB || 'spaced-repetition-flutter',
-    user: process.env.MONGO_USER || null,
-    pass: process.env.MONGO_PASS || null,
+    host: process.env.MONGO_HOST || devEnviroments.host,
+    port: process.env.MONGO_PORT || devEnviroments.port,
+    db: process.env.MONGO_DB || devEnviroments.db,
+    user: process.env.MONGO_USER || devEnviroments.user,
+    pass: process.env.MONGO_PASS || devEnviroments.pass
 };
+
+console.log(`mongodb://${mongoenv.user}:${mongoenv.pass}@${mongoenv.host}:${mongoenv.port}/${mongoenv.db}`);
 mongoose.connect(`mongodb://${mongoenv.user}:${mongoenv.pass}@${mongoenv.host}:${mongoenv.port}/${mongoenv.db}`, {useNewUrlParser: true});
 
 const mongoConnection = mongoose.connection;
